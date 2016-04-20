@@ -6,6 +6,11 @@ A series of bandit algorithms in Swift, built with functional programing and imm
 
 ![Swiper](http://i.imgur.com/EhLAg7t.png)
 
+## Swift Build System Instructions
+To run on the command line:
+1. `$ swift build` // requires you to be in the `./Swiper` directory
+1. `$ ./build/debug/Swiper`
+
 ## Epsilon-Greedy
 The epsilon in the [Epsilon-greedy strategy](https://en.wikipedia.org/wiki/Multi-armed_bandit#Semi-uniform_strategies) controls the proportion of explorations vs exploitations.
 
