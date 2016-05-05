@@ -1,50 +1,74 @@
 import Foundation
 
 public struct EpsilonGreedy {
-  public let epsilon: Double
-  public let counts: [Int]
-  public let values: [Double]
+  public typealias Handler = (count: Int, value: Double)
 
-  public init(epsilon: Double, counts: [Int], values: [Double]) {
+  public let epsilon: Double
+  public let handlers: [Handler]
+  public let topHandlerIndex: Int?
+
+  private init(epsilon: Double, handlers: [Handler], topHandlerIndex: Int?) {
     self.epsilon = epsilon
-    self.counts = counts
-    self.values = values
+    self.handlers = handlers
+    self.topHandlerIndex = topHandlerIndex
+  }
+
+  public init(epsilon: Double, handlers: [Handler]) {
+    self.epsilon = epsilon
+    self.handlers = handlers
+
+    guard let topHandler = handlers.maxElement({ (rhs, lhs) -> Bool in
+      rhs.value > lhs.value
+    }) else {
+      self.topHandlerIndex = nil
+      return
+    }
+
+    self.topHandlerIndex = handlers.indexOf { (handler) -> Bool in
+      handler.count == topHandler.count && handler.value == topHandler.value
+    }
   }
 
   public init(epsilon: Double, nArms: Int) {
-    self = EpsilonGreedy(epsilon: epsilon, counts: [], values: [])
-      .initialize(nArms: nArms)
+    self = EpsilonGreedy(epsilon: epsilon, handlers: [], topHandlerIndex: nil).initialize(nArms: nArms)
   }
 
   public func initialize(nArms nArms: Int) -> EpsilonGreedy {
-    return EpsilonGreedy(
-      epsilon: epsilon,
-      counts: (0..<nArms).map({ _ in 0 }),
-      values: (0..<nArms).map({ _ in 0 })
-    )
+    return EpsilonGreedy(epsilon: epsilon,
+                         handlers: [Handler](count: nArms, repeatedValue: (0, 0)),
+                         topHandlerIndex: nil)
   }
 
   public func newEpsilon(epsilon: Double) -> EpsilonGreedy {
-    return EpsilonGreedy(epsilon: epsilon, counts: counts, values: values)
+    return EpsilonGreedy(epsilon: epsilon,
+                         handlers: self.handlers,
+                         topHandlerIndex: self.topHandlerIndex)
   }
 
-  public func selectArm() -> Int? {
+  public func selectArm() -> Int {
     if Double(arc4random())/Double(UInt32.max) > epsilon {
-      return values.indMax()
+      return topHandlerIndex ?? Int(arc4random_uniform(UInt32(handlers.count)))
     }
-    return Int(arc4random_uniform(UInt32(values.count)))
+    return Int(arc4random_uniform(UInt32(handlers.count)))
   }
 
   public func update(chosenArm: Int, reward: Double) -> EpsilonGreedy {
-    var newCounts = counts
-    newCounts[chosenArm] = counts[chosenArm] + 1
+    var newHandlers = handlers
+    newHandlers[chosenArm].count += 1
 
-    var newValues = values
-    let n = Double(newCounts[chosenArm])
     // compute the running average
-    newValues[chosenArm] = ((n - 1) / n) * values[chosenArm] + (1 / n) * reward
+    let c = Double(newHandlers[chosenArm].count)
+    newHandlers[chosenArm].value = ((c - 1) / c) * handlers[chosenArm].value + (1 / c) * reward
 
-    return EpsilonGreedy(epsilon: epsilon, counts: newCounts, values: newValues)
+    let newTopHandlerIndex: Int
+    switch topHandlerIndex {
+    case let index?:
+      newTopHandlerIndex = (newHandlers[chosenArm].value > handlers[index].value) ? chosenArm : index
+    case nil:
+      newTopHandlerIndex = chosenArm
+    }
+
+    return EpsilonGreedy(epsilon: epsilon, handlers: newHandlers, topHandlerIndex: newTopHandlerIndex)
   }
-  
+
 }

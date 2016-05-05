@@ -17,25 +17,22 @@ func testAlgorithm<T: Arm where T: Arm>(
   arms: [T],
   numSims: Int,
   horizon: Int
-  ) throws -> TestFrameworkDataSet {
+  ) -> TestFrameworkDataSet {
 
   // make the algorithm mutable...
-  var algorithm = algorithm
-
-  let arrayOfInts = (0..<numSims * horizon).map { _ in 0 }
-  let arrayOfDoubles: [Double] = arrayOfInts.map { _ in 0 }
+  //var algorithm = algorithm
 
   var dataSet: TestFrameworkDataSet = (
-    simNums: arrayOfInts,
-    times: arrayOfInts,
-    chosenArms: arrayOfInts,
-    rewards: arrayOfDoubles,
-    cumulativeRewards: arrayOfDoubles
+    simNums: [Int](count: numSims * horizon, repeatedValue: 0),
+    times: [Int](count: numSims * horizon, repeatedValue: 0),
+    chosenArms: [Int](count: numSims * horizon, repeatedValue: 0),
+    rewards: [Double](count: numSims * horizon, repeatedValue: 0),
+    cumulativeRewards: [Double](count: numSims * horizon, repeatedValue: 0)
   )
 
   for sim in 1...numSims {
     // Reset the algoirthm to scratch
-    algorithm = algorithm.initialize(nArms: arms.count)
+    var algorithmSim = algorithm.initialize(nArms: arms.count)
 
     for t in 1...horizon {
       let index = (sim - 1) * horizon + t - 1
@@ -43,9 +40,8 @@ func testAlgorithm<T: Arm where T: Arm>(
       dataSet.simNums[index] = sim
       dataSet.times[index] = t
 
-      guard let chosenArm = algorithm.selectArm() else {
-        throw NSError(domain: "Error selecing arm of algorithm", code: 1, userInfo: nil)
-      }
+      let chosenArm = algorithmSim.selectArm()
+
       dataSet.chosenArms[index] = chosenArm
 
       let reward = arms[dataSet.chosenArms[index]].draw()
@@ -54,7 +50,7 @@ func testAlgorithm<T: Arm where T: Arm>(
       dataSet.cumulativeRewards[index] = (t == 1) ? reward
         : dataSet.cumulativeRewards[index - 1] + reward
 
-      algorithm = algorithm.update(chosenArm, reward: reward)
+      algorithmSim = algorithm.update(chosenArm, reward: reward)
     }
   }
   return dataSet

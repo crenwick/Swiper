@@ -23,13 +23,20 @@ class EpsilonGreedyTests: XCTestCase {
     let arms = means.map { BernoulliArm(probablity: $0) }
 
     self.measureBlock {
-      do {
-        let algorithm = EpsilonGreedy(epsilon: 0.1, nArms: means.count)
-        try testAlgorithm(algorithm, arms: arms, numSims: 500, horizon: 250)
-      } catch {
-        XCTFail()
-      }
+      let algorithm = EpsilonGreedy(epsilon: 0.1, nArms: means.count)
+      testAlgorithm(algorithm, arms: arms, numSims: 500, horizon: 250)
     }
+
+    let file = "standardResults.tsv"
+    let dir: NSString = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .AllDomainsMask, true).first!
+    let outputStream = NSOutputStream(toFileAtPath: dir.stringByAppendingPathComponent(file),
+                                      append: true)!
+    outputStream.open()
+
+    let string = "hello world"
+    let data = string.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+    let bytes = UnsafePointer<UInt8>(data.bytes)
+    outputStream.write(bytes, maxLength: data.length)
   }
 
 }
