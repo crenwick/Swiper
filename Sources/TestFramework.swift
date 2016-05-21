@@ -19,9 +19,6 @@ func testAlgorithm<T: Arm where T: Arm>(
   horizon: Int
   ) -> TestFrameworkDataSet {
 
-  // make the algorithm mutable...
-  //var algorithm = algorithm
-
   var dataSet: TestFrameworkDataSet = (
     simNums: [Int](count: numSims * horizon, repeatedValue: 0),
     times: [Int](count: numSims * horizon, repeatedValue: 0),
@@ -31,27 +28,32 @@ func testAlgorithm<T: Arm where T: Arm>(
   )
 
   for sim in 1...numSims {
-    // Reset the algoirthm to scratch
-    var algorithmSim = algorithm.initialize(nArms: arms.count)
 
-    for t in 1...horizon {
-      let index = (sim - 1) * horizon + t - 1
+    func selectArmAndUpdateDataSet(algorithm: EpsilonGreedy, simNumber: Int, simGoal: Int) -> Void {
+      if simNumber > simGoal {
+        return
+      }
+
+      let index = (sim - 1) * horizon + simNumber - 1
 
       dataSet.simNums[index] = sim
-      dataSet.times[index] = t
+      dataSet.times[index] = simNumber
 
-      let chosenArm = algorithmSim.selectArm()
+      let chosenArm = algorithm.selectArm()
 
       dataSet.chosenArms[index] = chosenArm
 
       let reward = arms[dataSet.chosenArms[index]].draw()
       dataSet.rewards[index] = reward
 
-      dataSet.cumulativeRewards[index] = (t == 1) ? reward
+      dataSet.cumulativeRewards[index] = (simNumber == 1) ? reward
         : dataSet.cumulativeRewards[index - 1] + reward
 
-      algorithmSim = algorithm.update(chosenArm, reward: reward)
+      let newAlgo = algorithm.update(chosenArm, reward: reward)
+      selectArmAndUpdateDataSet(newAlgo, simNumber: simNumber + 1, simGoal: simGoal)
     }
+    selectArmAndUpdateDataSet(algorithm.initialize(nArms: arms.count), simNumber: 1, simGoal: horizon)
+
   }
   return dataSet
 }

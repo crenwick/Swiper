@@ -5,7 +5,7 @@ let arms = means.map { BernoulliArm(probablity: $0) }
 print("Best arm is", means.indMax())
 
 do {
-  let file = "standardResults.tsv"
+  let file = "results_swift.tsv"
   guard
   let dir: NSString = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .AllDomainsMask, true).first,
   let outputStream = NSOutputStream(toFileAtPath: dir.stringByAppendingPathComponent(file), append: true) else {
@@ -15,9 +15,9 @@ do {
 
   for epsilon in [Double]([0.1, 0.2, 0.3, 0.4, 0.5]) {
     let algorithm = EpsilonGreedy(epsilon: epsilon, nArms: means.count)
-    let results = testAlgorithm(algorithm, arms: arms, numSims: 5, horizon: 10)
+    let results = testAlgorithm(algorithm, arms: arms, numSims: 100, horizon: 250)
 
-    for i in results.simNums {
+    for i in 0..<results.simNums.count {
       outputStream.write("\(epsilon)\t", maxLength: "\(epsilon)\t".characters.count)
       outputStream.write("\(results.simNums[i])\t", maxLength: "\(results.simNums[i])\t".characters.count)
       outputStream.write("\(results.times[i])\t", maxLength: "\(results.times[i])\t".characters.count)
