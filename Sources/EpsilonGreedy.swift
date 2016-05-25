@@ -30,19 +30,10 @@ public struct EpsilonGreedy {
   }
 
   public init(epsilon: Double, nArms: Int) {
-    self = EpsilonGreedy(epsilon: epsilon, handlers: [], topHandlerIndex: nil).initialize(nArms: nArms)
-  }
-
-  public func initialize(nArms nArms: Int) -> EpsilonGreedy {
-    return EpsilonGreedy(epsilon: epsilon,
-                         handlers: [Handler](count: nArms, repeatedValue: (0, 0)),
+    self = EpsilonGreedy(epsilon: epsilon,
+                         handlers: [Handler](count: nArms,
+                                             repeatedValue: (0, 0)),
                          topHandlerIndex: nil)
-  }
-
-  public func newEpsilon(epsilon: Double) -> EpsilonGreedy {
-    return EpsilonGreedy(epsilon: epsilon,
-                         handlers: self.handlers,
-                         topHandlerIndex: self.topHandlerIndex)
   }
 
   public func selectArm() -> Int {

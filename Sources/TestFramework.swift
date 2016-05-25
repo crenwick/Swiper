@@ -52,7 +52,7 @@ func testAlgorithm<T: Arm where T: Arm>(
       let newAlgo = algorithm.update(chosenArm, reward: reward)
       selectArmAndUpdateDataSet(newAlgo, simNumber: simNumber + 1, simGoal: simGoal)
     }
-    selectArmAndUpdateDataSet(algorithm.initialize(nArms: arms.count), simNumber: 1, simGoal: horizon)
+    selectArmAndUpdateDataSet(algorithm, simNumber: 1, simGoal: horizon)
 
   }
   return dataSet

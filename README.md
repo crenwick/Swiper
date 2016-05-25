@@ -20,6 +20,6 @@ The epsilon in the [Epsilon-greedy strategy](https://en.wikipedia.org/wiki/Multi
 let epsilonGreedy = EpsilonGreedy(0.1, nArms: 2)
 let selectedArm = epsilonGreedy.selectArm()
 somethingWithCallback(color: selectedArm) { (reward) in
-  epsilonGreedy.update(selectedArm, reward: reward)
+  let updatedEpsilonGreedy = epsilonGreedy.update(selectedArm, reward: reward)
 }
 ```
