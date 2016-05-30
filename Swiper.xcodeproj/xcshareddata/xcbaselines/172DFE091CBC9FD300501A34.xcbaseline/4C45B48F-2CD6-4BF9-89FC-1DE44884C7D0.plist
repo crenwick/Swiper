@@ -26,6 +26,16 @@
 					<string>Local Baseline</string>
 				</dict>
 			</dict>
+			<key>testPerformanceUCB1Algorithm()</key>
+			<dict>
+				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
+				<dict>
+					<key>baselineAverage</key>
+					<real>1.2876</real>
+					<key>baselineIntegrationDisplayName</key>
+					<string>Local Baseline</string>
+				</dict>
+			</dict>
 		</dict>
 	</dict>
 </dict>

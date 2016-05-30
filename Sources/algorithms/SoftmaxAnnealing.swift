@@ -47,7 +47,6 @@ public struct Softmax: BanditAlgorithm {
   }
 
   public func update(arm: Int, reward: Double) -> Softmax {
-    // update the handler[arm].count += 1
     var newHandlers = handlers
     newHandlers[arm].count += 1
 
