@@ -1,6 +1,5 @@
 import Foundation
 
-// MARK: - Fisher-Yets shuffle
 extension CollectionType {
   func shuffle() -> [Generator.Element] {
     var list = Array(self)
@@ -10,6 +9,10 @@ extension CollectionType {
 }
 
 extension MutableCollectionType where Index == Int {
+
+  /**
+   Fisher-Yates shuffle
+   */
   mutating func shuffleInPlace() {
     if count < 2 { return }
     for i in 0..<count - 1 {

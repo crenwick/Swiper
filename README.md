@@ -17,9 +17,22 @@ The epsilon in the [Epsilon-greedy strategy](https://en.wikipedia.org/wiki/Multi
 
 *Example usage:*
 ```swift
-let epsilonGreedy = EpsilonGreedy(0.1, nArms: 2)
+let epsilonGreedy = EpsilonGreedy(epsilon: 0.1, nArms: 2)
 let selectedArm = epsilonGreedy.selectArm()
 somethingWithCallback(color: selectedArm) { (reward) in
   let updatedEpsilonGreedy = epsilonGreedy.update(selectedArm, reward: reward)
+}
+```
+
+## Softmax (Annealing)
+The Annealing Softmax object selects arms based on a [softmax function](https://en.wikipedia.org/wiki/Softmax_function).
+This object does not require a temperature—the algorithm automatically manages it via simulated annealing.
+
+*Example usage:*
+```swift
+let softmax = Softmax(nArms: 3)
+let selectedArm = softmax.selectArm()
+somethingWithCallback(copy: selectedArm) { (reward) in
+  let updatedSoftmax = softmax.update(selectedArm, reward: reward)
 }
 ```

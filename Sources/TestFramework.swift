@@ -13,7 +13,7 @@ typealias TestFrameworkDataSet = (simNums: [Int], times: [Int], chosenArms: [Int
  - returns: A dataset that describes what arm was chosen in each simulation and how well the algorithm did at each point it ran.
  */
 func testAlgorithm<T: Arm where T: Arm>(
-  algorithm: EpsilonGreedy,
+  algorithm: BanditAlgorithm,
   arms: [T],
   numSims: Int,
   horizon: Int
@@ -29,7 +29,7 @@ func testAlgorithm<T: Arm where T: Arm>(
 
   for sim in 1...numSims {
 
-    func selectArmAndUpdateDataSet(algorithm: EpsilonGreedy, simNumber: Int, simGoal: Int) -> Void {
+    func selectArmAndUpdateDataSet(algorithm: BanditAlgorithm, simNumber: Int, simGoal: Int) -> Void {
       if simNumber > simGoal {
         return
       }

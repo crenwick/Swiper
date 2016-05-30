@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EpsilonGreedy {
+public struct EpsilonGreedy: BanditAlgorithm {
   public typealias Handler = (count: Int, value: Double)
 
   public let epsilon: Double
@@ -13,22 +13,15 @@ public struct EpsilonGreedy {
     self.topHandlerIndex = topHandlerIndex
   }
 
-  public init(epsilon: Double, handlers: [Handler]) {
-    self.epsilon = epsilon
-    self.handlers = handlers
+  /**
+   Makes a brand new EpsilonGreedy algorithm object.
+   This initializes a custom number of handlers, all with zero data.
 
-    guard let topHandler = handlers.maxElement({ (rhs, lhs) -> Bool in
-      rhs.value > lhs.value
-    }) else {
-      self.topHandlerIndex = nil
-      return
-    }
+   - parameter epsilon: The frequency to explore
+   - parameter nArms:   How many arms the algorithm should test
 
-    self.topHandlerIndex = handlers.indexOf { (handler) -> Bool in
-      handler.count == topHandler.count && handler.value == topHandler.value
-    }
-  }
-
+   - returns: A new instance of an Epsilon Greedy object, with no data
+   */
   public init(epsilon: Double, nArms: Int) {
     self = EpsilonGreedy(epsilon: epsilon,
                          handlers: [Handler](count: nArms,
@@ -43,20 +36,20 @@ public struct EpsilonGreedy {
     return Int(arc4random_uniform(UInt32(handlers.count)))
   }
 
-  public func update(chosenArm: Int, reward: Double) -> EpsilonGreedy {
+  public func update(arm: Int, reward: Double) -> EpsilonGreedy {
     var newHandlers = handlers
-    newHandlers[chosenArm].count += 1
+    newHandlers[arm].count += 1
 
     // compute the running average
-    let c = Double(newHandlers[chosenArm].count)
-    newHandlers[chosenArm].value = ((c - 1) / c) * handlers[chosenArm].value + (1 / c) * reward
+    let c = Double(newHandlers[arm].count)
+    newHandlers[arm].value = ((c - 1) / c) * handlers[arm].value + (1 / c) * reward
 
     let newTopHandlerIndex: Int
     switch topHandlerIndex {
     case let index?:
-      newTopHandlerIndex = (newHandlers[chosenArm].value > handlers[index].value) ? chosenArm : index
+      newTopHandlerIndex = (newHandlers[arm].value > handlers[index].value) ? arm : index
     case nil:
-      newTopHandlerIndex = chosenArm
+      newTopHandlerIndex = arm
     }
 
     return EpsilonGreedy(epsilon: epsilon, handlers: newHandlers, topHandlerIndex: newTopHandlerIndex)
